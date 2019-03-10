@@ -23,5 +23,17 @@
          (string-append x suffix))
          xs))
 
+;; list-nth-mod takes a list xs and a number n. If the number is negative
+;; terminate the computation with an error, else if the list is
+;; empty, terminate the list wtih an error, else return the ith
+;; element of the list where we count from zero and i is the remainder
+;; when dividing n by the list's length
+(define (list-nth-mod xs n)
+  (cond
+    [(< n 0)  (error "list-nth-mod: negative number")]
+    [(null? xs) (error "list-nth-mod: empty list")]
+    [list-ref xs (modulo n (length xs))]))
+     
+   
 
 
