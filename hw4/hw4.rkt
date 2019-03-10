@@ -60,5 +60,12 @@
                       (lambda () (f (+ x 1)))))
   (f 1))
 
+;; dan-then-dog is a stream that alterntates between "dan.jpg" and "dog.jpg", starting
+;; with dan.
 
-
+(define (dan-then-dog)
+  (define (f this-photo)
+    (define next-photo (if (string=? "dan.jpg" this-photo) "dog.jpg" "dan.jpg"))
+    (cons this-photo
+    (lambda () (f next-photo))))
+(f "dan.jpg"))
