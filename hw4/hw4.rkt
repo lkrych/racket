@@ -13,3 +13,15 @@
       null
       (cons low (sequence (+ low stride) high stride))))
 
+;; string-append-map takes a list of strings xs and a string suffix and
+;; returns a list of strings. Each element of theoutput should be the corresponding element
+;; of the input with the input appended to the suffix. You must use the Racket functions map
+;; string append
+
+(define (string-append-map xs suffix)
+  (map (lambda (x)
+         (string-append x suffix))
+         xs))
+
+
+
