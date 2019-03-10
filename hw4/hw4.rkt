@@ -69,3 +69,13 @@
     (cons this-photo
     (lambda () (f next-photo))))
 (f "dan.jpg"))
+
+;; stream-add-zero takes a stream s and returns another stream.
+;; if s would produce v for its ith element, then stream-add-zero s would produce
+;; the pair (0 . v) for its ith element
+
+(define (stream-add-zero s)
+  (define (f x) (cons
+                 (cons 0 (car (x)))
+                 (lambda () (f (cdr (x))))))
+    (lambda () (f s)))
