@@ -33,7 +33,23 @@
     [(< n 0)  (error "list-nth-mod: negative number")]
     [(null? xs) (error "list-nth-mod: empty list")]
     [list-ref xs (modulo n (length xs))]))
-     
-   
+
+;; define some streams for testing
+(define ones (lambda () (cons 1 ones)))
+(define nats
+  (letrec ([f (lambda (x) (cons x (lambda () (f (+ x 1)))))])
+    (lambda () (f 1))))
+(define powers-of-two
+  (letrec ([f (lambda (x) (cons x (lambda () (f (* x 2)))))])
+    (lambda () (f 2))))
+
+;; stream-for-n-steps takes a stream s and a number n
+;; it returns a list holding the first n values produced by s in order, assume n is non-negative
+
+(define (stream-for-n-steps s n)
+  (if (= n 0)
+      null
+      (cons (car (s)) (stream-for-n-steps (cdr (s)) (- n 1)))))
+
 
 
