@@ -52,4 +52,13 @@
       (cons (car (s)) (stream-for-n-steps (cdr (s)) (- n 1)))))
 
 
+;; funny-number-stream is like the stream of natural numbers except numbers
+;; divisible by 5 are negated
+
+(define (funny-number-stream)
+  (define (f x) (cons (if (= 0 (remainder x 5)) (- x) x)
+                      (lambda () (f (+ x 1)))))
+  (f 1))
+
+
 
