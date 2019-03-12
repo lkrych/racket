@@ -79,3 +79,67 @@
                  (cons 0 (car (x)))
                  (lambda () (f (cdr (x))))))
     (lambda () (f s)))
+
+;; cycle-lists takes two lists xs and ys and returns a stream.
+;; The elements produced by the stream are pairs where the first part is from xs
+;; and the second part are from ys. The stream cycles forever through the lists
+
+(define (cycle-lists xs ys)
+  (define streamx (stream-from-list xs))
+  (define streamy (stream-from-list ys))
+  (define (f sx sy) (cons
+                   (cons (car (sx)) (car (sy)))
+                   (lambda () (f (cdr (sx)) (cdr (sy))))))
+  (lambda () (f streamx streamy)))
+
+;; vector-assoc takes a value v and a vector vec
+;; it should behave like Racket's assoc library function
+;; except it processes a vector (array) instead of list
+;; it allows vector elements not to be pairs, in which case it skips them
+;; it always takes exactly two arguments. Process the vector elements in order starting from 0
+;; Return #f if no vector element is a pair with a car field equal to v, else return the first pair
+;; with an equal car field
+
+;; library assoc v list locates the first element of lst whose car is equal to v
+
+(define (vector-assoc v vec)
+  (define (f current-idx)
+    (let ([current-pair (vector-ref vec current-idx)])
+    (cond
+      [(= (vector-length vec) current-idx) #f] ;; if we've gotten to the end of the array and found no matches
+      [(cond ;; if there is a pair, check if they are equal, otherwise skip
+         [(pair? current-pair)
+          (cond
+            [(equal? (car current-pair) v) current-pair]
+            [else (f (+ current-idx 1))])]
+         [else (f (+ current-idx 1))])]))) ;;skip and keep searching
+  (f 0))
+
+;; cached-assoc takes a list xs and a number n and returns a function that takes
+;; one argument v and returns the same thing that (assoc v xs) would return. However,
+;; you should use an n-element cache of recent results to possibly make this function
+;; faster than just calling xs
+;; the cache must be a Racket vector of length n that is created by the call to cached-assoc
+;; and used-and-possibly-mutated each time the function returned by cached-assoc is called
+
+;; The cache starts empty. When the function returned by cached-assoc is called, it first checks
+;; the cache for an answer. If it is not there, it uses assoc and xs to get the answer
+;; and if the result is not #f, it adds the pair to the cache before returning.
+;; cache slots are used in a round-robin fashion, the first time a pair is added to the cache
+;; it is put in position 0, the next pair is put in position 1, when it wraps back around, the
+;; 0th pair is replaced
+
+(define (cached-assoc xs n)
+  ;; make cache
+  (let ([ cache (make-vector n #f) ]
+        [cache-idx 0])
+    (define (f v) ;;define assoc functoiun
+      (let ([cache-hit (vector-assoc v cache) ])
+      (cond
+        [(cache-hit) cache-hit] ;;check cache
+        [else
+         (let ([assoc-result (assoc v xs)])
+           (cond
+             [(assoc-result) (and (vector-set! cache cache-idx assoc-result) (set! cache-idx (modulo (+ cache-idx 1) n)))]))]))))
+  f) ;; return assoc function
+  
