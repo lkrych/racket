@@ -111,15 +111,16 @@
 
 (define (vector-assoc v vec)
   (define (f current-idx)
-    (let ([current-pair (vector-ref vec current-idx)])
     (cond
-      [(= (vector-length vec) current-idx) #f] ;; if we've gotten to the end of the array and found no matches
-      [(cond ;; if there is a pair, check if they are equal, otherwise skip
-         [(pair? current-pair)
+      [(= (vector-length vec) (- current-idx 1)) #f] ;; if we've gotten to the end of the array and found no matches
+     [else
+      (let ([current-pair (vector-ref vec current-idx)])
+       (cond
+         [(pair? current-pair) ;; if there is a pair, check if they are equal, otherwise skip
           (cond
             [(equal? (car current-pair) v) current-pair]
             [else (f (+ current-idx 1))])]
-         [else (f (+ current-idx 1))])]))) ;;skip and keep searching
+         [else (f (+ current-idx 1))]))])) ;;skip and keep searching
   (f 0))
 
 ;; cached-assoc takes a list xs and a number n and returns a function that takes
