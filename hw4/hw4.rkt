@@ -80,6 +80,13 @@
                  (lambda () (f (cdr (x))))))
     (lambda () (f s)))
 
+;; stream-from-list takes a list and creates a stream that cycles through that stream
+(define (stream-from-list l)
+  (define (f idx) (cons
+                   (list-ref l idx)
+                   (lambda () (f (+ idx 1)))))
+  (lambda () (f l)))
+
 ;; cycle-lists takes two lists xs and ys and returns a stream.
 ;; The elements produced by the stream are pairs where the first part is from xs
 ;; and the second part are from ys. The stream cycles forever through the lists
@@ -131,15 +138,20 @@
 
 (define (cached-assoc xs n)
   ;; make cache
-  (let ([ cache (make-vector n #f) ]
-        [cache-idx 0])
-    (define (f v) ;;define assoc functoiun
+  (letrec ([ cache (make-vector n) ]
+        [cache-idx 0]
+        [f (lambda(v) ;;define assoc function
       (let ([cache-hit (vector-assoc v cache) ])
       (cond
         [(cache-hit) cache-hit] ;;check cache
         [else
          (let ([assoc-result (assoc v xs)])
            (cond
-             [(assoc-result) (and (vector-set! cache cache-idx assoc-result) (set! cache-idx (modulo (+ cache-idx 1) n)))]))]))))
-  f) ;; return assoc function
+             [(assoc-result)
+              (begin (vector-set! cache cache-idx assoc-result)
+                   (set! cache-idx (modulo (+ cache-idx 1) n))
+                   assoc-result)]
+             [else #f]))])))]
+    )
+    f)) ;; return assoc function
   
