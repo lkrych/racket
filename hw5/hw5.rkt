@@ -81,7 +81,13 @@
                [new-env (cons (cons (mlet-var e) expression) env)]) ;; in this case we use expression in the new-environment!
            (eval-under-env (mlet-body e) new-env))]
         [(call? e)
-         (let ]
+         (let ([close (eval-under-env (call-funexp e) env)]
+               [arg (eval-under-env (call-actual e) env)])
+           (if (closure? close)
+               ;;do function things
+               (
+               (error "MUPL call applied to non-closure")))])
+               
                    
            
         ;; CHANGE add more cases here
