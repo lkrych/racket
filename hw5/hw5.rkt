@@ -28,6 +28,7 @@
       (aunit)
       (apair (car rlist) (racketlist->mupllist (cdr rlist)))))
 
+;; mupllist->racketlist does the inverse of the above function
 (define (mupllist->racketlist mlist)
   (if (aunit? mlist)
       null
@@ -42,6 +43,12 @@
   (cond [(null? env) (error "unbound variable during evaluation" str)]
         [(equal? (car (car env)) str) (cdr (car env))]
         [#t (envlookup (cdr env) str)]))
+;;helper function for checking if two values are ints
+(define (both-ints? v1 v2)
+  (if (and (int? v1)
+           (int? v2))
+      (#t)
+      (#f)))
 
 ;; Do NOT change the two cases given to you.  
 ;; DO add more cases for other kinds of MUPL expressions.
@@ -51,13 +58,25 @@
   (cond [(var? e) 
          (envlookup env (var-string e))]
         [(add? e) 
-         (let ([v1 (eval-under-env (add-e1 e) env)]
+         (let ([v1 (eval-under-env (add-e1 e) env)] ;;pull ints out of add expression and assign to instance variables
                [v2 (eval-under-env (add-e2 e) env)])
-           (if (and (int? v1)
-                    (int? v2))
+           (if (both-ints? v1 v2)
                (int (+ (int-num v1) 
                        (int-num v2)))
                (error "MUPL addition applied to non-number")))]
+        [(int? e) e]
+        [(closure? e) e]
+        [(fun? e) (closure env e)]
+        [(ifgreater? e)
+         (let ([v1 (eval-under-env (ifgreater-e1 e) env)]
+               [v2 (eval-under-env (ifgreater-e2 e) env)])
+           (if (both-ints? v1 v2)
+               (if (> v1 v2)
+                   (eval-under-env (if-greater-e3 e) env)
+                   (eval-under-env (if-greateer-e4 e) env))
+               (error "MUPL ifgreater applied to non-number")))]
+                   
+           
         ;; CHANGE add more cases here
         [#t (error (format "bad MUPL expression: ~v" e))]))
 
