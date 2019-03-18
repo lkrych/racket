@@ -20,14 +20,18 @@
 ;; a closure is not in "source" programs but /is/ a MUPL value; it is what functions evaluate to
 (struct closure (env fun) #:transparent) 
 
-;; Problem 1
-(define racketlist->mulplist rlist
-  (map (lambda (el)
-         (cond
-           [(string? el) (var el)]
-        )) rlist)
-)
+;; racketlist->mupllist takes a Racket list (presumably of mupl values but that will not affect your solution)
+;; and produces an analogous mupl list with the same elements in the same order.
+;; A mupl value is a mupl integer constant, a mupl closure, a mupl aunit, or a mupl pair of mupl values.
+(define (racketlist->mupllist rlist)
+  (if (null? rlist)
+      (aunit)
+      (apair (car rlist) (racketlist->mupllist (cdr rlist)))))
 
+(define (mupllist->racketlist mlist)
+  (if (aunit? mlist)
+      null
+      (cons (apair-e1 mlist) (mupllist->racketlist (apair-e2 mlist)))))
 ;; CHANGE (put your solutions here)
 
 ;; Problem 2
