@@ -77,9 +77,11 @@
                (error "MUPL ifgreater applied to non-number")))]
         [(aunit? e) e]
         [(mlet? e)
-         (let* ([v (eval-under-env (mlet-e e) env)]
-               [new-env (cons (cons (mlet-var e) v) env)])
+         (let* ([expression (eval-under-env (mlet-e e) env)];;let* allows later bindings to refer to earlier bindings
+               [new-env (cons (cons (mlet-var e) expression) env)]) ;; in this case we use expression in the new-environment!
            (eval-under-env (mlet-body e) new-env))]
+        [(call? e)
+         (let ]
                    
            
         ;; CHANGE add more cases here
