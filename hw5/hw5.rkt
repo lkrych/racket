@@ -72,8 +72,8 @@
                [v2 (eval-under-env (ifgreater-e2 e) env)])
            (if (both-ints? v1 v2)
                (if (> v1 v2)
-                   (eval-under-env (if-greater-e3 e) env)
-                   (eval-under-env (if-greateer-e4 e) env))
+                   (eval-under-env (ifgreater-e3 e) env)
+                   (eval-under-env (ifgreater-e4 e) env))
                (error "MUPL ifgreater applied to non-number")))]
                    
            
