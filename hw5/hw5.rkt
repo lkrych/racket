@@ -87,17 +87,29 @@
                ;;do function things
                (let* ([close-fun (closure-fun close)] ;;extract closure function and environment
                       [close-env (closure-env close)]
-                      [new-env (cons (cons (fun-formal clos-fun) arg ) close-env)] ;;map functions argument name
+                      [new-env (cons (cons (fun-formal close-fun) arg ) close-env)] ;;map functions argument name
                       [new-env (if (fun-nameopt close-fun) ;;map functions name to closure
                                    (cons (cons (fun-nameopt close-fun) close) new-env)
                                    new-env)])
                  (eval-under-env (fun-body close-fun) new-env))
                (error "MUPL call applied to non-closure")))]
-        
-               
-                   
-           
-        ;; CHANGE add more cases here
+        [(apair? e)
+         (let ([v1 (eval-under-env (apair-e1) env)]
+               [v2 (eval-under-env (apair-e2) env)])
+           (apair v1 v2))]
+        [(fst? e)
+         (let ([v (eval-under-env (fst-e e) env)])
+           (if (apair? v)
+               (apair-e1 v)
+               (error "MUPL fst applied non pair")))]
+        [(snd? e)
+         (let ([v (eval-under-env (snd-e e) env)])
+           (if (apair? v)
+               (apair-e2 v)
+               (error "MUPL snd applied non pair")))]
+        [(isaunit? e)
+         (int 1)
+         (int 0)]
         [#t (error (format "bad MUPL expression: ~v" e))]))
 
 ;; Do NOT change
