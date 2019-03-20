@@ -85,8 +85,15 @@
                [arg (eval-under-env (call-actual e) env)])
            (if (closure? close)
                ;;do function things
-               (
-               (error "MUPL call applied to non-closure")))])
+               (let* ([close-fun (closure-fun close)] ;;extract closure function and environment
+                      [close-env (closure-env close)]
+                      [new-env (cons (cons (fun-formal clos-fun) arg ) close-env)] ;;map functions argument name
+                      [new-env (if (fun-nameopt close-fun) ;;map functions name to closure
+                                   (cons (cons (fun-nameopt close-fun) close) new-env)
+                                   new-env)])
+                 (eval-under-env (fun-body close-fun) new-env))
+               (error "MUPL call applied to non-closure")))]
+        
                
                    
            
